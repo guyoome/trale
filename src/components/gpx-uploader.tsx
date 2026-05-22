@@ -1,12 +1,38 @@
 import { useState, useRef } from 'react'
 import { Upload, FileCheck, X } from 'lucide-react'
+import { useNavigate } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { parseGpx } from '@/lib/gpx-parser'
+import { createTale } from '@/lib/api'
 
 export const GpxUploader = () => {
     const [file, setFile] = useState<File | null>(null)
     const [isDragging, setIsDragging] = useState(false)
     const inputRef = useRef<HTMLInputElement>(null)
+    const navigate = useNavigate()
+
+    const loadGpxFile = async (gpxFile: File) => {
+        const content = await gpxFile.text()
+        const gpxData = parseGpx(content, gpxFile.name)
+        const dateStr = gpxData.date ? new Date(gpxData.date).toLocaleDateString('fr-FR', {
+            month: 'short',
+            day: 'numeric',
+        }) : new Date().toLocaleDateString('fr-FR', { month: 'short', day: 'numeric' })
+        const { id } = await createTale({
+            data: {
+                name: gpxData.name,
+                timestamp: dateStr,
+                date: gpxData.date,
+                coordinates: gpxData.coordinates,
+                chapters: [],
+                distanceKm: gpxData.distanceKm,
+                elevationGain: gpxData.elevationGain,
+                kmEffort: gpxData.kmEffort,
+            },
+        })
+        navigate({ to: '/tale/$taleId', params: { taleId: id } })
+    }
 
     const handleDragOver = (e: React.DragEvent) => {
         e.preventDefault()
@@ -23,6 +49,7 @@ export const GpxUploader = () => {
         const dropped = e.dataTransfer.files[0]
         if (dropped && dropped.name.endsWith('.gpx')) {
             setFile(dropped)
+            loadGpxFile(dropped)
         }
     }
 
@@ -30,6 +57,7 @@ export const GpxUploader = () => {
         const selected = e.target.files?.[0]
         if (selected && selected.name.endsWith('.gpx')) {
             setFile(selected)
+            loadGpxFile(selected)
         }
     }
 
@@ -65,8 +93,8 @@ export const GpxUploader = () => {
                         onDrop={handleDrop}
                         onClick={() => inputRef.current?.click()}
                         className={`flex flex-col items-center justify-center gap-3 p-8 rounded-lg border-2 border-dashed cursor-pointer transition-colors ${isDragging
-                                ? 'border-primary bg-primary/5'
-                                : 'border-border hover:border-muted-foreground'
+                            ? 'border-primary bg-primary/5'
+                            : 'border-border hover:border-muted-foreground'
                             }`}
                     >
                         <Upload className="size-8 text-muted-foreground" />

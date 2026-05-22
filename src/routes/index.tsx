@@ -5,6 +5,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { ProfileHeader } from '@/components/profile-header'
 import { TaleCard } from '@/components/tale-card'
 import { BottomNav } from '@/components/bottom-nav'
+import { H1 } from '@/components/ui/typography'
 
 export const Route = createFileRoute('/')({
     component: () => <HomePage />,
@@ -43,7 +44,7 @@ const HomePage = () => {
                         }`}
                 >
                     <div>
-                        <h1 className="text-lg font-bold font-heading">{user.username}</h1>
+                        <H1>{user.username}</H1>
                         <p className="text-xs text-muted-foreground">{user.fullName}</p>
                     </div>
                     <Avatar className="size-9">

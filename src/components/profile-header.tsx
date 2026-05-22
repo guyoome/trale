@@ -1,11 +1,12 @@
 import type { User } from '@/lib/mock-data'
 import { Calendar, MapPin, Camera } from 'lucide-react'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
+import { H1 } from '@/components/ui/typography'
 
 export const ProfileHeader = ({ user }: { user: User }) => (
     <div className="flex items-start justify-between">
         <div className="flex-1">
-            <h1 className="text-2xl font-bold font-heading">{user.username}</h1>
+            <H1>{user.username}</H1>
             <p className="text-sm text-muted-foreground">{user.fullName}</p>
 
             <div className="mt-3 space-y-1.5">

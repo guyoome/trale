@@ -3,3 +3,9 @@ node_modules
 .vinxi
 .tanstack
 dist
+
+/src/generated/prisma
+
+prisma/dev.db
+prisma/dev.db-journal
+.env

@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as NewTaleRouteImport } from './routes/new-tale'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TaleTaleIdRouteImport } from './routes/tale/$taleId'
 
 const NewTaleRoute = NewTaleRouteImport.update({
   id: '/new-tale',
@@ -22,31 +23,40 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TaleTaleIdRoute = TaleTaleIdRouteImport.update({
+  id: '/tale/$taleId',
+  path: '/tale/$taleId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/new-tale': typeof NewTaleRoute
+  '/tale/$taleId': typeof TaleTaleIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/new-tale': typeof NewTaleRoute
+  '/tale/$taleId': typeof TaleTaleIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/new-tale': typeof NewTaleRoute
+  '/tale/$taleId': typeof TaleTaleIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/new-tale'
+  fullPaths: '/' | '/new-tale' | '/tale/$taleId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/new-tale'
-  id: '__root__' | '/' | '/new-tale'
+  to: '/' | '/new-tale' | '/tale/$taleId'
+  id: '__root__' | '/' | '/new-tale' | '/tale/$taleId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   NewTaleRoute: typeof NewTaleRoute
+  TaleTaleIdRoute: typeof TaleTaleIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +75,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tale/$taleId': {
+      id: '/tale/$taleId'
+      path: '/tale/$taleId'
+      fullPath: '/tale/$taleId'
+      preLoaderRoute: typeof TaleTaleIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   NewTaleRoute: NewTaleRoute,
+  TaleTaleIdRoute: TaleTaleIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
