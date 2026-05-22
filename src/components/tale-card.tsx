@@ -3,6 +3,7 @@ import { Link } from '@tanstack/react-router'
 import { MoreHorizontal, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardAction } from '@/components/ui/card'
+import { GpxMapViewer } from '@/components/gpx-map-viewer-lazy'
 
 export const TaleCard = ({ tale }: { tale: TaleResponse }) => (
     <Link to="/tale/$taleId" params={{ taleId: tale.id }} className="block">
@@ -22,8 +23,13 @@ export const TaleCard = ({ tale }: { tale: TaleResponse }) => (
             </CardHeader>
             <CardContent>
                 <div className="flex gap-1.5 overflow-x-auto pb-1">
-                    {tale.chapters.map((chapter) => (
-                        <div key={chapter.distance} className="relative flex-shrink-0">
+                    {tale.coordinates.length > 0 && (
+                        <div className="relative flex-shrink-0 size-20 rounded-lg overflow-hidden">
+                            <GpxMapViewer coordinates={tale.coordinates} />
+                        </div>
+                    )}
+                    {tale.chapters.map((chapter, index) => (
+                        <div key={chapter.id} className="relative flex-shrink-0">
                             <img
                                 src={chapter.picture}
                                 alt={`${chapter.distance}`}

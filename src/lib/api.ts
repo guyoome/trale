@@ -2,8 +2,10 @@ import { createServerFn } from '@tanstack/react-start'
 import { fetchUser } from './mock-data'
 
 export interface Chapter {
+    id: string
     distance: number
     picture: string
+    text?: string
 }
 
 export interface TaleResponse {
@@ -61,4 +63,38 @@ export const createTale = createServerFn({
         const { saveTale } = await import('./tale-store')
         const id = await saveTale(data)
         return { id }
+    })
+
+export const uploadImage = createServerFn({
+    method: 'POST',
+}).inputValidator((input: { base64: string; filename: string }) => input)
+    .handler(async ({ data }) => {
+        const { writeFile } = await import('fs/promises')
+        const { join } = await import('path')
+        const { randomUUID } = await import('crypto')
+
+        const ext = data.filename.split('.').pop() || 'jpg'
+        const name = `${randomUUID()}.${ext}`
+        const buffer = Buffer.from(data.base64, 'base64')
+        await writeFile(join('public', 'uploads', name), buffer)
+
+        return { url: `/uploads/${name}` }
+    })
+
+export const addChapter = createServerFn({
+    method: 'POST',
+}).inputValidator((input: { taleId: string; distance: number; picture: string; text?: string }) => input)
+    .handler(async ({ data }) => {
+        const { addChapterToTale } = await import('./tale-store')
+        await addChapterToTale(data.taleId, { distance: data.distance, picture: data.picture, text: data.text })
+        return { success: true }
+    })
+
+export const updateChapter = createServerFn({
+    method: 'POST',
+}).inputValidator((input: { taleId: string; chapterIndex: number; distance: number; picture: string; text?: string }) => input)
+    .handler(async ({ data }) => {
+        const { updateChapterInTale } = await import('./tale-store')
+        await updateChapterInTale(data.taleId, data.chapterIndex, { distance: data.distance, picture: data.picture, text: data.text })
+        return { success: true }
     })

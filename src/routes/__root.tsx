@@ -27,6 +27,13 @@ const RootComponent = () => (
     </RootDocument>
 )
 
+const NotFound = () => (
+    <div className="h-svh bg-background flex flex-col items-center justify-center max-w-md mx-auto px-4">
+        <h1 className="text-2xl font-bold font-heading">404</h1>
+        <p className="text-muted-foreground mt-2">Page introuvable</p>
+    </div>
+)
+
 export const Route = createRootRoute({
     head: () => ({
         meta: [
@@ -44,4 +51,5 @@ export const Route = createRootRoute({
         links: [{ rel: 'stylesheet', href: appCss }],
     }),
     component: RootComponent,
+    notFoundComponent: NotFound,
 })

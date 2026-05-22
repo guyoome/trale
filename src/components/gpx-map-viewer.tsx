@@ -69,7 +69,7 @@ export const GpxMapViewer = ({ coordinates, fullscreen = false }: GpxMapViewerPr
     const center = coordinates[0]
 
     return (
-        <div className="w-full h-full rounded-lg overflow-hidden">
+        <div className="w-full h-full rounded-lg overflow-hidden relative z-0">
             <MapContainer
                 center={center}
                 zoom={13}

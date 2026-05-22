@@ -4,8 +4,10 @@ import { db } from '@/lib/db'
 import type { Tale as PrismaTale } from '@/generated/prisma/client'
 
 export interface Chapter {
+    id: string
     distance: number
     picture: string
+    text?: string
 }
 
 export interface StoredTale {
@@ -57,4 +59,33 @@ export const getTaleById = async (id: string): Promise<StoredTale | null> => {
 export const getAllTales = async (): Promise<StoredTale[]> => {
     const tales = await db.tale.findMany()
     return tales.map(toStoredTale)
+}
+
+export const addChapterToTale = async (taleId: string, chapter: Omit<Chapter, 'id'>): Promise<void> => {
+    const { randomUUID } = await import('crypto')
+    const tale = await db.tale.findUnique({ where: { id: taleId } })
+    if (!tale) throw new Error('Tale not found')
+
+    const chapters = JSON.parse(tale.chapters) as Chapter[]
+    chapters.push({ ...chapter, id: randomUUID() })
+    chapters.sort((a, b) => a.distance - b.distance)
+
+    await db.tale.update({
+        where: { id: taleId },
+        data: { chapters: JSON.stringify(chapters) },
+    })
+}
+
+export const updateChapterInTale = async (taleId: string, chapterIndex: number, chapter: Omit<Chapter, 'id'>): Promise<void> => {
+    const tale = await db.tale.findUnique({ where: { id: taleId } })
+    if (!tale) throw new Error('Tale not found')
+
+    const chapters = JSON.parse(tale.chapters) as Chapter[]
+    chapters[chapterIndex] = { ...chapter, id: chapters[chapterIndex].id }
+    chapters.sort((a, b) => a.distance - b.distance)
+
+    await db.tale.update({
+        where: { id: taleId },
+        data: { chapters: JSON.stringify(chapters) },
+    })
 }
