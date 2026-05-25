@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 import { useState, useRef, useEffect } from 'react'
 import { getUser, getTales } from '@/lib/api'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
@@ -9,9 +9,16 @@ import { H1 } from '@/components/ui/typography'
 
 export const Route = createFileRoute('/')({
     component: () => <HomePage />,
-    loader: async () => {
-        const [user, tales] = await Promise.all([getUser(), getTales()])
-        return { user, tales }
+    beforeLoad: async () => {
+        const user = await getUser()
+        if (!user) {
+            throw redirect({ to: '/login' })
+        }
+        return { user }
+    },
+    loader: async ({ context }) => {
+        const tales = await getTales()
+        return { user: context.user, tales }
     },
 })
 

@@ -34,7 +34,7 @@ const toStoredTale = (tale: PrismaTale): StoredTale => ({
     kmEffort: tale.kmEffort,
 })
 
-export const saveTale = async (data: Omit<StoredTale, 'id'>): Promise<string> => {
+export const saveTale = async (data: Omit<StoredTale, 'id'> & { userId: string }): Promise<string> => {
     const tale = await db.tale.create({
         data: {
             name: data.name,
@@ -45,6 +45,7 @@ export const saveTale = async (data: Omit<StoredTale, 'id'>): Promise<string> =>
             distanceKm: data.distanceKm,
             elevationGain: data.elevationGain,
             kmEffort: data.kmEffort,
+            userId: data.userId,
         },
     })
     return tale.id
@@ -56,8 +57,8 @@ export const getTaleById = async (id: string): Promise<StoredTale | null> => {
     return toStoredTale(tale)
 }
 
-export const getAllTales = async (): Promise<StoredTale[]> => {
-    const tales = await db.tale.findMany()
+export const getAllTales = async (userId: string): Promise<StoredTale[]> => {
+    const tales = await db.tale.findMany({ where: { userId } })
     return tales.map(toStoredTale)
 }
 

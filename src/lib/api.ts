@@ -1,5 +1,5 @@
 import { createServerFn } from '@tanstack/react-start'
-import { fetchUser } from './mock-data'
+import { getSession } from './auth-functions'
 
 export interface Chapter {
     id: string
@@ -34,14 +34,26 @@ export interface CreateTaleInput {
 export const getUser = createServerFn({
     method: 'GET',
 }).handler(async () => {
-    return fetchUser()
+    const session = await getSession()
+    if (!session) {
+        return null
+    }
+    return {
+        id: session.user.id,
+        username: session.user.name,
+        fullName: session.user.name,
+        avatar: session.user.image ?? '',
+        email: session.user.email,
+    }
 })
 
 export const getTales = createServerFn({
     method: 'GET',
 }).handler(async () => {
+    const session = await getSession()
+    if (!session) return []
     const { getAllTales } = await import('./tale-store')
-    return getAllTales()
+    return getAllTales(session.user.id)
 })
 
 export const getTale = createServerFn({
@@ -60,8 +72,10 @@ export const createTale = createServerFn({
     method: 'POST',
 }).inputValidator((input: CreateTaleInput) => input)
     .handler(async ({ data }) => {
+        const session = await getSession()
+        if (!session) throw new Error('Unauthorized')
         const { saveTale } = await import('./tale-store')
-        const id = await saveTale(data)
+        const id = await saveTale({ ...data, userId: session.user.id })
         return { id }
     })
 
