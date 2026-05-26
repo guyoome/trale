@@ -68,7 +68,7 @@ const HomePage = () => {
                         }`}
                 >
                     <div className="py-6">
-                        <ProfileHeader user={user} />
+                        <ProfileHeader user={user} taleCount={tales.length} chapterCount={tales.reduce((sum, t) => sum + t.chapters.length, 0)} totalKmEffort={tales.reduce((sum, t) => sum + t.kmEffort, 0)} />
                     </div>
                 </div>
             </header>
