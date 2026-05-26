@@ -124,7 +124,7 @@ export const StoryViewer = ({ tale, chapters, open, onClose }: StoryViewerProps)
                     <>
                         {/* Map background */}
                         <div className="w-full h-full">
-                            <GpxMapViewer coordinates={tale.coordinates} />
+                            <GpxMapViewer coordinates={tale.coordinates} chapters={chapters} />
                         </div>
 
                         {/* Title overlay */}

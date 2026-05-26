@@ -156,7 +156,7 @@ const TalePage = () => {
                             }`}
                         onClick={() => setIsFullscreen(true)}
                     >
-                        <GpxMapViewer coordinates={tale.coordinates} />
+                        <GpxMapViewer coordinates={tale.coordinates} chapters={tale.chapters} />
                     </div>
                 </div>
 
@@ -201,6 +201,7 @@ const TalePage = () => {
                     <GpxMapViewer
                         coordinates={tale.coordinates}
                         fullscreen={isFullscreen}
+                        chapters={tale.chapters}
                     />
                     <button
                         onClick={() => setIsFullscreen(false)}

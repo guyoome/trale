@@ -5,12 +5,17 @@ const GpxMapViewerInner = lazy(() =>
     import('./gpx-map-viewer').then((mod) => ({ default: mod.GpxMapViewer }))
 )
 
+interface ChapterPin {
+    distance: number
+}
+
 interface GpxMapViewerLazyProps {
     coordinates: LatLngExpression[]
     fullscreen?: boolean
+    chapters?: ChapterPin[]
 }
 
-export const GpxMapViewer = ({ coordinates, fullscreen }: GpxMapViewerLazyProps) => {
+export const GpxMapViewer = ({ coordinates, fullscreen, chapters }: GpxMapViewerLazyProps) => {
     const [mounted, setMounted] = useState(false)
 
     useEffect(() => {
@@ -23,7 +28,7 @@ export const GpxMapViewer = ({ coordinates, fullscreen }: GpxMapViewerLazyProps)
 
     return (
         <Suspense fallback={<div className="w-full h-full bg-muted rounded-lg animate-pulse" />}>
-            <GpxMapViewerInner coordinates={coordinates} fullscreen={fullscreen} />
+            <GpxMapViewerInner coordinates={coordinates} fullscreen={fullscreen} chapters={chapters} />
         </Suspense>
     )
 }
