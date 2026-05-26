@@ -64,6 +64,7 @@ model Tale {
   timestamp     String   // Display string like "juil. 3 - 9"
   date          DateTime?
   coordinates   String   @default("[]") // JSON-encoded [number, number][]
+  elevations    String   @default("[]") // JSON-encoded {distance: number, elevation: number}[]
   chapters      String   @default("[]") // JSON-encoded Chapter[]
   distanceKm    Int      @default(0)
   elevationGain Int      @default(0)

@@ -9,9 +9,15 @@ export interface GpxData {
     date: string | null
     points: GpxPoint[]
     coordinates: [number, number][]
+    elevations: ElevationPoint[]
     distanceKm: number
     elevationGain: number
     kmEffort: number
+}
+
+export interface ElevationPoint {
+    distance: number // cumulative distance in km
+    elevation: number // elevation in meters
 }
 
 const haversineDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
@@ -102,11 +108,32 @@ export const parseGpx = (gpxContent: string, fileName: string): GpxData => {
     // Km effort = km + D+ / 100
     const kmEffort = distanceKm + elevationGain / 100
 
+    // Build elevation profile (distance vs elevation)
+    const elevations: ElevationPoint[] = []
+    let cumulativeDistance = 0
+    for (let i = 0; i < points.length; i++) {
+        if (i > 0) {
+            cumulativeDistance += haversineDistance(
+                points[i - 1].lat,
+                points[i - 1].lon,
+                points[i].lat,
+                points[i].lon
+            )
+        }
+        if (points[i].ele !== null) {
+            elevations.push({
+                distance: cumulativeDistance,
+                elevation: points[i].ele!,
+            })
+        }
+    }
+
     return {
         name,
         date,
         points,
         coordinates,
+        elevations,
         distanceKm: Math.round(distanceKm),
         elevationGain: Math.round(elevationGain),
         kmEffort: Math.round(kmEffort),

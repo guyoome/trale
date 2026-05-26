@@ -1,5 +1,3 @@
-"use server"
-
 import { db } from '@/lib/db'
 import type { Tale as PrismaTale } from '@/generated/prisma/client'
 
@@ -16,6 +14,7 @@ export interface StoredTale {
     timestamp: string
     date: string | null
     coordinates: [number, number][]
+    elevations: { distance: number; elevation: number }[]
     chapters: Chapter[]
     distanceKm: number
     elevationGain: number
@@ -28,6 +27,7 @@ const toStoredTale = (tale: PrismaTale): StoredTale => ({
     timestamp: tale.timestamp,
     date: tale.date?.toISOString() ?? null,
     coordinates: JSON.parse(tale.coordinates) as [number, number][],
+    elevations: JSON.parse(tale.elevations) as { distance: number; elevation: number }[],
     chapters: JSON.parse(tale.chapters) as Chapter[],
     distanceKm: tale.distanceKm,
     elevationGain: tale.elevationGain,
@@ -41,6 +41,7 @@ export const saveTale = async (data: Omit<StoredTale, 'id'> & { userId: string }
             timestamp: data.timestamp,
             date: data.date ? new Date(data.date) : null,
             coordinates: JSON.stringify(data.coordinates),
+            elevations: JSON.stringify(data.elevations),
             chapters: JSON.stringify(data.chapters),
             distanceKm: data.distanceKm,
             elevationGain: data.elevationGain,
@@ -89,4 +90,8 @@ export const updateChapterInTale = async (taleId: string, chapterIndex: number, 
         where: { id: taleId },
         data: { chapters: JSON.stringify(chapters) },
     })
+}
+
+export const deleteTaleById = async (id: string): Promise<void> => {
+    await db.tale.delete({ where: { id } })
 }

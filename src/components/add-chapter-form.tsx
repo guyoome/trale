@@ -1,16 +1,18 @@
 import { useState, useRef, useEffect } from 'react'
 import { ImagePlus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { ElevationProfile } from '@/components/elevation-profile'
 import type { Chapter } from '@/lib/api'
 
 interface AddChapterFormProps {
     maxKm: number
+    elevations?: { distance: number; elevation: number }[]
     initialData?: Chapter
     onSubmit: (data: { distance: number; text: string; file: File | null }) => void
     isLoading?: boolean
 }
 
-export const AddChapterForm = ({ maxKm, initialData, onSubmit, isLoading }: AddChapterFormProps) => {
+export const AddChapterForm = ({ maxKm, elevations, initialData, onSubmit, isLoading }: AddChapterFormProps) => {
     const [distance, setDistance] = useState(initialData?.distance ?? Math.round(maxKm / 2))
     const [text, setText] = useState(initialData?.text ?? '')
     const [file, setFile] = useState<File | null>(null)
@@ -52,6 +54,13 @@ export const AddChapterForm = ({ maxKm, initialData, onSubmit, isLoading }: AddC
                 <label className="text-sm font-medium">
                     Distance : <span className="text-primary">{distance} km</span>
                 </label>
+                {elevations && elevations.length > 1 && (
+                    <ElevationProfile
+                        elevations={elevations}
+                        maxKm={maxKm}
+                        currentKm={distance}
+                    />
+                )}
                 <input
                     type="range"
                     min={0}

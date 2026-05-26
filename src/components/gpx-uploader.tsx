@@ -25,6 +25,7 @@ export const GpxUploader = () => {
                 timestamp: dateStr,
                 date: gpxData.date,
                 coordinates: gpxData.coordinates,
+                elevations: gpxData.elevations,
                 chapters: [],
                 distanceKm: gpxData.distanceKm,
                 elevationGain: gpxData.elevationGain,

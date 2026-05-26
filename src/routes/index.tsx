@@ -77,7 +77,7 @@ const HomePage = () => {
             <div ref={mainRef} className="flex-1 overflow-y-auto px-4 pt-4 pb-20">
                 <div className="space-y-4">
                     {tales.map((tale) => (
-                        <TaleCard key={tale.name} tale={tale} />
+                        <TaleCard key={tale.id} tale={tale} />
                     ))}
                 </div>
             </div>

@@ -1,5 +1,6 @@
 import { createServerFn } from '@tanstack/react-start'
-import { getSession } from './auth-functions'
+import { getRequestHeaders } from '@tanstack/react-start/server'
+import { auth } from './auth'
 
 export interface Chapter {
     id: string
@@ -14,6 +15,7 @@ export interface TaleResponse {
     timestamp: string
     date: string | null
     coordinates: [number, number][]
+    elevations: { distance: number; elevation: number }[]
     chapters: Chapter[]
     distanceKm: number
     elevationGain: number
@@ -25,6 +27,7 @@ export interface CreateTaleInput {
     timestamp: string
     date: string | null
     coordinates: [number, number][]
+    elevations: { distance: number; elevation: number }[]
     chapters: Chapter[]
     distanceKm: number
     elevationGain: number
@@ -34,7 +37,8 @@ export interface CreateTaleInput {
 export const getUser = createServerFn({
     method: 'GET',
 }).handler(async () => {
-    const session = await getSession()
+    const headers = getRequestHeaders()
+    const session = await auth.api.getSession({ headers })
     if (!session) {
         return null
     }
@@ -50,7 +54,8 @@ export const getUser = createServerFn({
 export const getTales = createServerFn({
     method: 'GET',
 }).handler(async () => {
-    const session = await getSession()
+    const headers = getRequestHeaders()
+    const session = await auth.api.getSession({ headers })
     if (!session) return []
     const { getAllTales } = await import('./tale-store')
     return getAllTales(session.user.id)
@@ -72,7 +77,8 @@ export const createTale = createServerFn({
     method: 'POST',
 }).inputValidator((input: CreateTaleInput) => input)
     .handler(async ({ data }) => {
-        const session = await getSession()
+        const headers = getRequestHeaders()
+        const session = await auth.api.getSession({ headers })
         if (!session) throw new Error('Unauthorized')
         const { saveTale } = await import('./tale-store')
         const id = await saveTale({ ...data, userId: session.user.id })
@@ -110,5 +116,17 @@ export const updateChapter = createServerFn({
     .handler(async ({ data }) => {
         const { updateChapterInTale } = await import('./tale-store')
         await updateChapterInTale(data.taleId, data.chapterIndex, { distance: data.distance, picture: data.picture, text: data.text })
+        return { success: true }
+    })
+
+export const deleteTale = createServerFn({
+    method: 'POST',
+}).inputValidator((input: { id: string }) => input)
+    .handler(async ({ data }) => {
+        const headers = getRequestHeaders()
+        const session = await auth.api.getSession({ headers })
+        if (!session) throw new Error('Unauthorized')
+        const { deleteTaleById } = await import('./tale-store')
+        await deleteTaleById(data.id)
         return { success: true }
     })

@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { createFileRoute, useRouter } from '@tanstack/react-router'
-import { ArrowLeft, Eye, Footprints, Plus, Ruler, TrendingUp, X } from 'lucide-react'
-import { getTale, uploadImage, addChapter, updateChapter } from '@/lib/api'
+import { createFileRoute, useRouter, useNavigate } from '@tanstack/react-router'
+import { ArrowLeft, Eye, Footprints, MoreHorizontal, Plus, Ruler, Trash2, TrendingUp, X } from 'lucide-react'
+import { getTale, uploadImage, addChapter, updateChapter, deleteTale } from '@/lib/api'
 import type { Chapter } from '@/lib/api'
 import { GpxMapViewer } from '@/components/gpx-map-viewer-lazy'
 import { H1 } from '@/components/ui/typography'
@@ -25,6 +25,8 @@ const TalePage = () => {
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [isStoryOpen, setIsStoryOpen] = useState(false)
     const [editingChapter, setEditingChapter] = useState<{ index: number; chapter: Chapter } | null>(null)
+    const [isMoreOpen, setIsMoreOpen] = useState(false)
+    const navigate = useNavigate()
 
     const handleAddChapter = async (data: { distance: number; text: string; file: File | null }) => {
         setIsSubmitting(true)
@@ -99,6 +101,12 @@ const TalePage = () => {
         setIsSheetOpen(true)
     }
 
+    const handleDeleteTale = async () => {
+        if (!confirm('Supprimer ce tale ? Cette action est irréversible.')) return
+        await deleteTale({ data: { id: tale.id } })
+        navigate({ to: '/' })
+    }
+
     return (
         <div className="h-svh bg-background flex flex-col max-w-md mx-auto">
             <div className="shrink-0 px-4 pt-4 flex items-center justify-between">
@@ -109,19 +117,8 @@ const TalePage = () => {
                     <ArrowLeft className="size-4" />
                     <span>Retour</span>
                 </button>
-                {tale.chapters.length > 0 && (
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setIsStoryOpen(true)}
-                        className="flex items-center gap-1.5 text-sm"
-                    >
-                        <Eye className="size-4" />
-                        <span>Preview</span>
-                    </Button>
-                )}
             </div>
-            <div className="flex-1 overflow-y-auto px-4 pt-4 pb-6">
+            <div className="flex-1 overflow-y-auto px-4 pt-4 pb-20">
                 <div className="flex items-stretch gap-6">
                     <div className="flex-1 min-w-0">
                         <H1 className="leading-tight break-words">
@@ -218,6 +215,7 @@ const TalePage = () => {
             <BottomSheet open={isSheetOpen} onClose={() => { setIsSheetOpen(false); setEditingChapter(null) }}>
                 <AddChapterForm
                     maxKm={tale.distanceKm}
+                    elevations={tale.elevations}
                     initialData={editingChapter?.chapter}
                     onSubmit={editingChapter ? handleUpdateChapter : handleAddChapter}
                     isLoading={isSubmitting}
@@ -231,6 +229,49 @@ const TalePage = () => {
                 open={isStoryOpen}
                 onClose={() => setIsStoryOpen(false)}
             />
+
+            {/* Bottom navbar */}
+            <div className="shrink-0 border-t border-border bg-background px-4 py-3 flex items-center justify-around">
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setIsStoryOpen(true)}
+                    disabled={tale.chapters.length === 0}
+                    className="flex flex-col items-center gap-1 h-auto py-1.5"
+                >
+                    <Eye className="size-5" />
+                </Button>
+                <div className="relative">
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setIsMoreOpen(!isMoreOpen)}
+                        className="flex flex-col items-center gap-1 h-auto py-1.5"
+                    >
+                        <MoreHorizontal className="size-5" />
+                    </Button>
+                    {isMoreOpen && (
+                        <>
+                            <div
+                                className="fixed inset-0 z-40"
+                                onClick={() => setIsMoreOpen(false)}
+                            />
+                            <div className="absolute bottom-full right-0 mb-2 z-50 bg-popover border border-border rounded-lg shadow-lg py-1 min-w-[160px]">
+                                <button
+                                    onClick={() => {
+                                        setIsMoreOpen(false)
+                                        handleDeleteTale()
+                                    }}
+                                    className="w-full px-4 py-2.5 text-sm text-left text-destructive hover:bg-destructive/10 flex items-center gap-2"
+                                >
+                                    <Trash2 className="size-4" />
+                                    <span>Supprimer le tale</span>
+                                </button>
+                            </div>
+                        </>
+                    )}
+                </div>
+            </div>
         </div>
     )
 }
