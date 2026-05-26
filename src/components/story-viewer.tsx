@@ -147,21 +147,21 @@ export const StoryViewer = ({ tale, chapters, open, onClose }: StoryViewerProps)
                             className="w-full h-full object-cover"
                         />
 
-                        {/* Text centered on picture */}
-                        {chapter!.text && (
-                            <div className="absolute inset-0 flex items-center justify-center px-6">
-                                <span className="bg-black/40 backdrop-blur-sm text-white text-xl font-semibold px-5 py-2 rounded-sm text-center">
-                                    {chapter!.text}
-                                </span>
-                            </div>
-                        )}
-
-                        {/* KM chip at bottom */}
-                        <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/70 to-transparent">
+                        {/* KM chip at top left */}
+                        <div className="absolute top-12 left-4 z-10">
                             <span className="inline-block bg-white/20 backdrop-blur-sm text-white text-sm font-semibold px-4 py-1.5 rounded-full">
                                 KM {chapter!.distance}
                             </span>
                         </div>
+
+                        {/* Text at bottom */}
+                        {chapter!.text && (
+                            <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/70 to-transparent">
+                                <span className="bg-black/40 backdrop-blur-sm text-white text-xl font-semibold px-5 py-2 rounded-sm text-center block">
+                                    {chapter!.text}
+                                </span>
+                            </div>
+                        )}
                     </>
                 )}
             </div>
